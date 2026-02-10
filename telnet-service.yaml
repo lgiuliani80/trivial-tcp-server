@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: telnet-service
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telnet-server
+  namespace: telnet-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telnet-server
+  template:
+    metadata:
+      labels:
+        app: telnet-server
+    spec:
+      containers:
+      - name: telnet
+        image: busybox:latest
+        command: 
+          - /bin/sh
+          - -c
+          - |
+            nc -l -p 23 -e /bin/sh || \
+            { while true; do echo "Welcome to Telnet Server"; sleep 1; done | nc -l -p 23; }
+        ports:
+        - name: telnet
+          containerPort: 23
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: telnet-loadbalancer
+  namespace: telnet-service
+  labels:
+    app: telnet-server
+spec:
+  type: LoadBalancer
+  ports:
+  - name: telnet
+    port: 23
+    targetPort: 23
+    protocol: TCP
+  selector:
+    app: telnet-server
+  sessionAffinity: ClientIP
