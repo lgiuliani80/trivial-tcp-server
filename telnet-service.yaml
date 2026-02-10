@@ -21,16 +21,10 @@ spec:
     spec:
       containers:
       - name: telnet
-        image: busybox:latest
-        command: 
-          - /bin/sh
-          - -c
-          - |
-            nc -l -p 23 -e /bin/sh || \
-            { while true; do echo "Welcome to Telnet Server"; sleep 1; done | nc -l -p 23; }
+        image: ghcr.io/lgiuliani80/trivial-tcp-server:master-8794151
         ports:
         - name: telnet
-          containerPort: 23
+          containerPort: 2323
           protocol: TCP
         resources:
           requests:
@@ -52,8 +46,8 @@ spec:
   type: LoadBalancer
   ports:
   - name: telnet
-    port: 23
-    targetPort: 23
+    port: 2323
+    targetPort: 2323
     protocol: TCP
   selector:
     app: telnet-server
