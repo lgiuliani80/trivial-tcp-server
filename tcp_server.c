@@ -43,7 +43,7 @@ int main() {
     }
 
     // Listen
-    if (listen(server_socket, 3) < 0) {
+    if (listen(server_socket, 50) < 0) {
         perror("Errore: Listen fallito");
         close(server_socket);
         return 1;
