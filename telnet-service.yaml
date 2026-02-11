@@ -21,18 +21,18 @@ spec:
     spec:
       containers:
       - name: telnet
-        image: ghcr.io/lgiuliani80/trivial-tcp-server:master-8794151
+        image: ghcr.io/lgiuliani80/trivial-tcp-server:0.0.2
         ports:
         - name: telnet
           containerPort: 2323
           protocol: TCP
-        resources:
-          requests:
-            cpu: 100m
-            memory: 64Mi
-          limits:
-            cpu: 200m
-            memory: 128Mi
+        #resources:
+        #  requests:
+        #    cpu: 100m
+        #    memory: 64Mi
+        #  limits:
+        #    cpu: 200m
+        #    memory: 128Mi
 
 ---
 apiVersion: v1
@@ -52,3 +52,4 @@ spec:
   selector:
     app: telnet-server
   sessionAffinity: ClientIP
+  externalTrafficPolicy: Local
