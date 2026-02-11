@@ -10,10 +10,12 @@
 
 int main() {
     int server_socket, client_socket;
-    struct sockaddr_in server_addr, client_addr;
+    struct sockaddr_in server_addr, client_addr, local_addr;
     socklen_t client_addr_len = sizeof(client_addr);
+    socklen_t local_addr_len = sizeof(local_addr);
     char buffer[BUFFER_SIZE];
     char client_ip[INET_ADDRSTRLEN];
+    char local_ip[INET_ADDRSTRLEN];
 
     // Crea socket
     server_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -55,10 +57,20 @@ int main() {
         inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
         int client_port = ntohs(client_addr.sin_port);
 
+        // Ottieni IP e porta locale
+        int local_port;
+        if (getsockname(client_socket, (struct sockaddr*)&local_addr, &local_addr_len) == 0) {
+            inet_ntop(AF_INET, &local_addr.sin_addr, local_ip, INET_ADDRSTRLEN);
+            local_port = ntohs(local_addr.sin_port);
+        } else {
+            strcpy(local_ip, "unknown");
+            local_port = 0;
+        }
+
         printf("Connessione ricevuta da %s:%d\n", client_ip, client_port);
 
         // Prepara messaggio da inviare
-        snprintf(buffer, BUFFER_SIZE, "IP chiamante: %s\nPorta chiamante: %d\n", client_ip, client_port);
+        snprintf(buffer, BUFFER_SIZE, "IP chiamante: %s\r\nPorta chiamante: %d\r\nIP locale: %s\r\nPorta locale: %d\r\n", client_ip, client_port, local_ip, local_port);
 
         // Invia messaggio al client
         send(client_socket, buffer, strlen(buffer), 0);
