@@ -20,6 +20,8 @@ int main() {
     char timestamp[32];
     time_t now;
     struct tm *tm_info;
+    
+    srand(time(NULL));
 
     // Crea socket
     server_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -84,6 +86,10 @@ int main() {
 
         // Invia messaggio al client
         send(client_socket, buffer, strlen(buffer), 0);
+
+        // Ritardo random tra 100ms e 10s (100000 - 10000000 microsecondi)
+        int delay_us = 100000 + (rand() % 9900001);
+        usleep(delay_us);
 
         // Chiudi connessione
         close(client_socket);
