@@ -58,12 +58,14 @@ int main() {
         int client_port = ntohs(client_addr.sin_port);
 
         // Ottieni IP e porta locale
+        int local_port;
         if (getsockname(client_socket, (struct sockaddr*)&local_addr, &local_addr_len) == 0) {
             inet_ntop(AF_INET, &local_addr.sin_addr, local_ip, INET_ADDRSTRLEN);
+            local_port = ntohs(local_addr.sin_port);
         } else {
             strcpy(local_ip, "unknown");
+            local_port = 0;
         }
-        int local_port = ntohs(local_addr.sin_port);
 
         printf("Connessione ricevuta da %s:%d\n", client_ip, client_port);
 
