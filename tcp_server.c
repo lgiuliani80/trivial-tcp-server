@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <time.h>
 
 #define PORT 2323
 #define BUFFER_SIZE 256
@@ -16,6 +17,9 @@ int main() {
     char buffer[BUFFER_SIZE];
     char client_ip[INET_ADDRSTRLEN];
     char local_ip[INET_ADDRSTRLEN];
+    char timestamp[32];
+    time_t now;
+    struct tm *tm_info;
 
     // Crea socket
     server_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -57,6 +61,14 @@ int main() {
         inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
         int client_port = ntohs(client_addr.sin_port);
 
+        // Ottieni timestamp ISO8601
+        time(&now);
+        tm_info = gmtime(&now);
+        strftime(timestamp, sizeof(timestamp), "%Y-%m-%dT%H:%M:%SZ", tm_info);
+
+        // Stampa informazioni connessione con timestamp
+        printf("[%s] %s:%d\n", timestamp, client_ip, client_port);
+
         // Ottieni IP e porta locale
         int local_port;
         if (getsockname(client_socket, (struct sockaddr*)&local_addr, &local_addr_len) == 0) {
@@ -67,8 +79,6 @@ int main() {
             local_port = 0;
         }
 
-        printf("Connessione ricevuta da %s:%d\n", client_ip, client_port);
-
         // Prepara messaggio da inviare
         snprintf(buffer, BUFFER_SIZE, "IP chiamante: %s\r\nPorta chiamante: %d\r\nIP locale: %s\r\nPorta locale: %d\r\n", client_ip, client_port, local_ip, local_port);
 
@@ -77,7 +87,13 @@ int main() {
 
         // Chiudi connessione
         close(client_socket);
-        printf("Connessione chiusa.\n\n");
+        
+        // Ottieni timestamp per chiusura
+        time(&now);
+        tm_info = gmtime(&now);
+        strftime(timestamp, sizeof(timestamp), "%Y-%m-%dT%H:%M:%SZ", tm_info);
+        
+        printf("[%s] %s:%d closed\n", timestamp, client_ip, client_port);
     }
 
     // Cleanup
