@@ -51,5 +51,4 @@ spec:
     protocol: TCP
   selector:
     app: telnet-server
-  sessionAffinity: ClientIP
   externalTrafficPolicy: Local
